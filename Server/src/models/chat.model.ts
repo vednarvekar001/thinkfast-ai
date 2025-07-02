@@ -5,10 +5,12 @@ export interface ChatDocument extends Document {
   user: mongoose.Types.ObjectId;
   messages: ChatCompletionRequestMessage[];
   createdAt: Date;
+  imageUrl: String;
 }
 
 const chatSchema = new Schema<ChatDocument>(
   {
+    imageUrl: { type: String },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     messages: [
       {

@@ -5,7 +5,7 @@ const storage = multer.memoryStorage();
 
 const profileUpload = multer({
   storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  limits: { fileSize: 25 * 1024 * 1024 }, // 2MB
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
       return cb(new Error('Only image files are allowed with a limit of 2mb!'));
@@ -14,4 +14,4 @@ const profileUpload = multer({
   },
 });
 
-export default profileUpload.single('profilePic'); // field name from frontend
+export default profileUpload; // field name from frontend

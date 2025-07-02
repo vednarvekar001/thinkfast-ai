@@ -1,0 +1,105 @@
+📁 src/
+├── 📁 api/
+│   ├── auth.ts                ← login, register
+│   ├── chat.ts                ← AI chat, history
+│   └── user.ts                ← settings/profile
+│
+├── 📁 assets/                 ← images, logos
+│
+├── 📁 components/
+│   ├── auth/
+│   │   ├── LoginForm.tsx
+│   │   └── RegisterForm.tsx
+│   │
+│   ├── chat/
+│   │   ├── ChatInput.tsx
+│   │   ├── Message.tsx
+│   │   ├── FileUpload.tsx
+│   │   └── ChatHistoryModal.tsx
+│   │
+│   ├── layout/
+│   │   ├── Navbar.tsx
+│   │   └── Sidebar.tsx (if needed)
+│   │
+│   ├── settings/
+│   │   └── ProfileImageUploader.tsx
+│   │
+│   └── ui/
+│       ├── Button.tsx
+│       ├── Spinner.tsx
+│       └── Toast.tsx
+│
+├── 📁 context/
+│   └── authContext.tsx       ← user info, JWT, profilePic
+│
+├── 📁 hooks/
+│   └── useChatMemory.ts      ← memory management hook
+│
+├── 📁 pages/
+│   ├── Landing.tsx
+│   ├── Login.tsx
+│   ├── Register.tsx
+│   ├── Chat.tsx
+│   └── Settings.tsx
+│
+├── 📁 router/
+│   └── index.tsx             ← ProtectedRoute logic
+│
+├── 📁 types/
+│   └── user.ts
+│
+├── App.tsx
+└── main.tsx
+
+
+✅ Phase 1: Landing Page
+Clean public page describing your platform
+Call-to-action: “Start Learning”, “Login”
+
+✅ Phase 2: Auth
+/login and /register
+Use JWT + context
+Save user info in authContext.tsx
+After login → redirect to /chat
+
+✅ Phase 3: Chat Page
+Show chat messages
+Input for text
+Upload PDF/image file to backend
+Call AI API with message or extracted text
+Stream responses if using OpenAI/OpenRouter
+Store messages in context/local state
+
+✅ Phase 4: AI Memory (Frontend)
+Save messages in context/state
+Show ongoing messages even after file upload
+(Optional) Save memory in DB per chat
+
+✅ Phase 5: Settings Page
+/settings
+Show name, email (readonly)
+Upload profile pic to Cloudinary
+Update profile pic in authContext
+
+✅ Phase 6: Navbar + Chat History Modal
+Show profile pic in navbar
+On click: dropdown → “Settings” + “Logout”
+Add "Past Chats" button → open modal
+Modal fetches /chat/get-history from backend
+Click on a chat → load that history into chat context
+
+✅ Phase 7: Final Touches
+Protected routes (use PrivateRoute in router/)
+Toasts (react-toastify)
+Loading spinners for upload/AI/submit
+Dark/light mode toggle (optional)
+Mobile responsiveness
+
+🧪 Extras You Can Add
+Chat scroll-to-bottom auto
+Typing animation for AI messages
+Markdown support in AI replies
+Context-aware memory across sessions
+Export chat as PDF
+Feedback button for AI response
+

@@ -1,6 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, {Schema, Document} from "mongoose";
 
-const uploadSchema = new mongoose.Schema({
+
+export interface uploadDocument extends Document {
+    filename: String,
+    filetype: String,
+    uploadedBy: mongoose.Schema.Types.ObjectId,
+    createdAt: Date
+}
+
+
+const uploadSchema = new Schema({
     filename: {
         type: String,
         required: true,
@@ -14,8 +23,20 @@ const uploadSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    cloudinaryUrl: {
+        type: String,
+        required: true,
+    },
+    extractedText: {
+        type: String,
+    },
     createdAt: {
         type: Date,
         default: Date.now
     },
-})
+},
+{ timestamps: true },
+);
+
+const Upload = mongoose.model<uploadDocument>('Upload', uploadSchema)
+export default Upload;
