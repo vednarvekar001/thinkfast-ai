@@ -1,0 +1,139 @@
+thinkfast-ai/
+└── backend/
+    ├── src/
+    │   ├── app.ts
+    │   ├── server.ts
+    │
+    │   ├── config/
+    │   │   ├── cloudinary.ts
+    │   │   ├── db.ts
+    |   |   └── jwt.ts
+    │
+    │   ├── controllers/
+    │   │   ├── auth.controller.ts
+    │   │   ├── chat.controller.ts
+    │   │   ├── upload.controller.ts
+    │   │   └── user.controller.ts
+    │
+    │   ├── middlewares/
+    │   │   ├── auth.middleware.ts            // ✅ checkAuth
+    │   │   ├── chatUpload.middleware.ts      // ✅ multer for chat files
+    │   │   ├── profileUpload.middleware.ts   // ✅ multer + cloudinary resize
+    │   │   ├── error.middleware.ts
+    │   │   └── rateLimit.middleware.ts
+    │
+    │   ├── models/
+    │   │   ├── user.model.ts
+    │   │   ├── chat.model.ts
+    │   │   └── upload.model.ts
+    │
+    │   ├── routes/
+    │   │   ├── auth.routes.ts
+    │   │   ├── chat.routes.ts
+    │   │   ├── upload.routes.ts
+    │   │   └── user.routes.ts
+    │
+    │   ├── ai/
+    │   │   ├── ai.service.ts
+    │   │   └── provider/
+    │   │       ├── openrouter.ts
+    │   │       ├── ollama.ts
+    │   │       └── groq.ts
+    │
+    │   ├── utils/
+    │   │   ├── extractText.ts
+    │   │   └── validateFile.ts
+    │
+    │   └── types/
+    │       └── express/index.d.ts
+    │
+    ├── .env
+    ├── .env.template
+    ├── .gitignore
+    ├── package.json
+    ├── tsconfig.json
+
+
+✅ What This Includes
+💬 Chat System
+Chat routes & controller
+
+MongoDB chat memory per user
+
+Streaming or prompt-based OpenRouter/Ollama support
+
+📄 Uploads (Images / PDFs)
+Separate chatUpload.middleware.ts (folder: chat-uploads)
+
+profileUpload.middleware.ts (folder: profile_pictures)
+
+extractText.ts uses tesseract.js and pdf-parse
+
+👤 User System
+Register, login, logout
+
+Update profile picture
+
+View profile (Settings page with name/email shown, editable profile pic only)
+
+🛡️ Auth System
+JWT-based auth.middleware.ts
+
+Protected routes
+
+Token generation and cookie handling
+
+☁️ Cloudinary Integration
+Separate CloudinaryStorage config for chatUpload and profileUpload
+
+📦 MongoDB Models
+User, Upload, and Chat models with Mongoose
+
+🧠 AI Memory + History
+AI chat remembers past messages (stored in chat.model.ts)
+
+Can later plug into vector search or fine-tuned models
+
+
+✅ Phase 1: Core System Setup
+| Step | What                                 | Why                           |
+| ---- | ------------------------------------ | ----------------------------- |
+| 1️⃣  | `src/config/db.ts`                   | Setup DB connection (MongoDB) |
+| 2️⃣  | `src/lib/jwt.ts`                     | JWT functions for auth        |
+| 3️⃣  | `src/models/user.model.ts`           | Base User model               |
+| 4️⃣  | `src/middlewares/auth.middleware.ts` | `checkAuth` middleware        |
+| 5️⃣  | `src/controllers/auth.controller.ts` | Login, register, logout logic |
+| 6️⃣  | `src/routes/auth.routes.ts`          | Route to wire up the above    |
+
+
+
+✅ Phase 2: AI & Uploads
+| Step | What                                 | Why                                  |
+| ---- | ------------------------------------ | ------------------------------------ |
+| 7️⃣  | `src/ai/provider/openrouter.ts`      | Base model provider (OpenRouter)     |
+| 8️⃣  | `src/ai/ai.service.ts`               | AI chat with memory                  |
+| 9️⃣  | `src/models/chat.model.ts`           | For saving chat memory in DB         |
+| 🔟   | `src/controllers/chat.controller.ts` | Actual chat logic (input → response) |
+| 🔁   | `src/routes/chat.routes.ts`          | AI chat route                        |
+
+
+
+✅ Phase 3: Uploads
+| Step | What                                       | Why                             |
+| ---- | ------------------------------------------ | ------------------------------- |
+| 11️⃣ | `profileUpload.middleware.ts` + Cloudinary | For profile pics                |
+| 12️⃣ | `chatUpload.middleware.ts` + Cloudinary    | For PDF/image questions uploads |
+| 13️⃣ | `upload.controller.ts`                     | OCR + save to DB                |
+| 14️⃣ | `upload.model.ts`                          | Save uploaded file data         |
+| 15️⃣ | `upload.routes.ts`                         | Route for upload/fetch          |
+
+
+
+✅ Phase 4: Extras & Finalization
+| Step | What                       | Why                          |
+| ---- | -------------------------- | ---------------------------- |
+| ✅    | `user.controller.ts`       | View/update profile pic      |
+| ✅    | `user.routes.ts`           | For `/settings` etc          |
+| ✅    | `types/express/index.d.ts` | Type-safe `req.user`         |
+| ✅    | `error.middleware.ts`      | Centralized error handler    |
+| ✅    | `rateLimit.middleware.ts`  | Optional for DDoS/throttling |
