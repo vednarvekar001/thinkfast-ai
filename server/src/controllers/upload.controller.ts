@@ -1,14 +1,13 @@
 import { Request, Response } from 'express';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 dotenv.config();
-// DO NOT config cloudinary again here
-import cloudinary from '../config/cloudinary'; // just import
+
+import cloudinary from '../config/cloudinary';
 import { v2 } from 'cloudinary';
 import streamifier from 'streamifier';
 import Tesseract from 'tesseract.js';
 import pdfParse from 'pdf-parse';
 import Upload from '../models/upload.model';
-import Chat from '../models/chat.model';
 import { UserDocument } from '../models/user.model';
 
 v2.config({
@@ -16,7 +15,6 @@ v2.config({
   api_key: process.env.CLOUDINARY_API_KEY!,
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
-
 
 interface AuthRequest extends Request {
   file?: Express.Multer.File;
@@ -28,8 +26,7 @@ interface AuthRequest extends Request {
 // -------------------------------
 export const handleProfileUpload = async (req: AuthRequest, res: Response) => {
   try {
-    if (!req.file)return res.status(400).json({ message: 'No file uploaded' });
-
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
     if (!req.user?._id) return res.status(401).json({ message: 'Unauthorized' });
 
     const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
@@ -101,35 +98,24 @@ export const handleChatUpload = async (req: AuthRequest, res: Response) => {
       extractedText = 'No readable text extracted from file.';
     }
 
-    // Save to DB
-    const [upload, chat] = await Promise.all([
-      Upload.create({
-        filename: originalname,
-        filetype: mimetype,
-        fileUrl: result.secure_url,
-        uploadedBy: req.user._id,
-      }),
-      Chat.create({
-        user: req.user._id,
-        messages: [
-          {
-            role: 'user',
-            content: extractedText,
-          },
-        ],
-      }),
-    ]);
+    console.log('📄 Upload extracted text:', extractedText);
+
+    // Save file info in Uploads (not Chat)
+    const upload = await Upload.create({
+      filename: originalname,
+      filetype: mimetype,
+      fileUrl: result.secure_url,
+      uploadedBy: req.user._id,
+    });
 
     res.status(200).json({
       message: 'Upload successful',
       fileUrl: result.secure_url,
       extractedText,
       uploadId: upload._id,
-      chatId: chat._id,
     });
   } catch (err) {
     console.error('❌ Chat Upload Error:', err);
     res.status(500).json({ message: 'Chat file upload failed' });
   }
 };
-

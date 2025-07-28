@@ -1,33 +1,37 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/user.model'; // adjust path if needed
+import User from '../models/user.model';
+import { JwtPayload } from 'jsonwebtoken';
 
 dotenv.config();
 
 const checkAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+  // ✅ Use cookie only (if you're using cookie-based auth)
+  const token = req.cookies?.token;
 
   if (!token) {
-    res.status(401).json({ message: 'Unauthorized access, Please login' });
+    res.status(401).json({ message: 'Unauthorized: No token provided' });
     return;
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
+    // ✅ Decode the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
 
     const user = await User.findById(decoded.userId);
     if (!user) {
-      res.status(401).json({ message: 'User not found' });
+      res.status(401).json({ message: 'Unauthorized: User not found' });
       return;
     }
 
+    // ✅ Attach user to request
     req.user = user;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Invalid token, Please login again' });
+    console.error('Auth error:', err);
+    res.status(401).json({ message: 'Unauthorized: Invalid token' });
   }
 };
-
 
 export default checkAuth;
