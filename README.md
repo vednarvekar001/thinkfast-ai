@@ -1,2 +1,2 @@
 # thinkfast-ai
-AI-powered tutoring platform that helps students crack exams faster with smart chat, file understanding, and personalized practice.
+AI-powered buddy to help you grow and learn things faster and quicker than ever.
