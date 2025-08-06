@@ -104,7 +104,7 @@ export const handleChatUpload = async (req: AuthRequest, res: Response) => {
     const upload = await Upload.create({
       filename: originalname,
       filetype: mimetype,
-      fileUrl: result.secure_url,
+      cloudinaryUrl: result.secure_url,
       uploadedBy: req.user._id,
     });
 

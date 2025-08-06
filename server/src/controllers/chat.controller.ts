@@ -27,29 +27,35 @@ export const handleChat = async (req: AuthRequest, res: Response) => {
 
     const userMessage = fileInfo ? `📄 ${fileInfo.name}` : finalPrompt;
 
-    const chat = chatId 
-      ? await Chat.findOneAndUpdate(
-          { _id: chatId, user: userId },
-          {
-            $push: {
-              messages: {
-                $each: [
-                  { role: 'user', content: userMessage },
-                  { role: 'assistant', content: response }
-                ]
-              }
+    let chat;
+    if (chatId) {
+      // Existing chat - just add messages
+      chat = await Chat.findOneAndUpdate(
+        { _id: chatId, user: userId },
+        {
+          $push: {
+            messages: {
+              $each: [
+                { role: 'user', content: userMessage },
+                { role: 'assistant', content: response }
+              ]
             }
-          },
-          { new: true }
-        )
-      : await Chat.create({
-          user: userId,
-          messages: [
-            { role: 'user', content: userMessage },
-            { role: 'assistant', content: response }
-          ],
-          title: (fileInfo ? fileInfo.name : finalPrompt).slice(0, 50) + '...',
-        });
+          }
+        },
+        { new: true }
+      );
+    } else {
+      // New chat - create with initial title based on content
+      const title = (fileInfo ? fileInfo.name : finalPrompt).slice(0, 50) + '...';
+      chat = await Chat.create({
+        user: userId,
+        messages: [
+          { role: 'user', content: userMessage },
+          { role: 'assistant', content: response }
+        ],
+        title: title,
+      });
+    }
 
     res.status(200).json({ response, chatId: chat._id });
   } catch (err) {
@@ -73,7 +79,7 @@ export const createNewChat = async (req: AuthRequest, res: Response) => {
     const newChat = new Chat({
       user: req.user?._id,
       messages: [],
-      title: 'New Chat',
+      title: 'New Chat', // Default title
     });
 
     await newChat.save();

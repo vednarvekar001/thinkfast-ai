@@ -1,55 +1,24 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { default as Link } from 'next/link'; // Modified import
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
-import { WiCloudUp, WiCloudy } from 'react-icons/wi';
+import { WiCloudy } from 'react-icons/wi';
 
 interface Props {
-  onFileUpload: (file: File) => void;
-  onExtractedText: (text: string) => void;
   user: {
     profilePic?: string;
   };
 }
 
-export default function NavbarChat({ onFileUpload, onExtractedText, user }: Props) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export default function NavbarChat({ user }: Props) {
   const router = useRouter();
   const [historyOpen, setHistoryOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState<any[]>([]);
-
-  const handleUploadClick = () => fileInputRef.current?.click();
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    onFileUpload(file);
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      toast.info('Uploading...');
-      const res = await fetch('http://localhost:8114/api/upload', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Upload failed');
-
-      toast.success('✅ Upload successful!');
-      if (onExtractedText && data.extractedText) {
-        onExtractedText(data.extractedText);
-      }
-    } catch (err) {
-      toast.error('❌ Upload failed');
-      console.error(err);
-    }
-  };
+  
+  
 
   const fetchChatHistory = async () => {
     try {
@@ -67,7 +36,7 @@ export default function NavbarChat({ onFileUpload, onExtractedText, user }: Prop
     }
   };
 
-  const createNewChat = async () => {
+ const createNewChat = async () => {
   try {
     const res = await fetch('http://localhost:8114/api/chat/new', {
       method: 'POST',
@@ -93,16 +62,22 @@ export default function NavbarChat({ onFileUpload, onExtractedText, user }: Prop
         <h2 className="text-xl font-semibold font-mono">ThinkFast AI</h2>
       </div>
 
-      {/* Upload Button */}
-      <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
-        <button
-          onClick={handleUploadClick}
-          className="font-mono text-xl font-semibold flex items-center gap-3 px-8 py-2 bg-white/10 rounded-full hover:bg-white/30 transition-all duration-300"
-        >
-          <WiCloudUp size={30} /> Upload
-        </button>
-        <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-      </div>
+      <div className="text-lg flex items-center space-x-10 absolute left-1/2 transform -translate-x-1/2">
+            <Link href="/" className="hover:text-gray-300 transition">
+                 Home
+            </Link>
+            <Link href="/about" className="hover:text-gray-300 transition">
+                 About
+            </Link>
+            <Link href="/chat" className="hover:text-gray-300 transition">
+                Chat with AI
+            </Link>
+            <Link href="/login" className='hover:text-gray-300 transition'>
+                Login/Register
+            </Link>
+        </div>
+
+      
 
       {/* Right Side */}
       <div className="absolute right-5 flex items-center gap-3">

@@ -22,7 +22,7 @@ app.use(cors({
 }));
 
 // ✅ Middleware for JSON parsing and cookies
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
 // ✅ API routes

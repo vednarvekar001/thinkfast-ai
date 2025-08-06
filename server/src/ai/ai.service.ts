@@ -53,17 +53,42 @@ export const chatWithAI = async (options: ChatWithAIOptions): Promise<string> =>
   const { userId, prompt, history, fileInfo } = options;
   const responseConfig = getResponseConfig(prompt);
 
+  // Determine response type
+  const isGreetingMsg = isGreeting(prompt);
+  const isCapabilitiesQuery = /what can you do|capabilities|functions/i.test(prompt);
+  const isTechnical = isTechnicalQuestion(prompt);
+
+  // HARD-CODED RESPONSES
+  if (isGreetingMsg) {
+    const name = extractName(prompt);
+    return `Hi${name ? ' ' + name : ''}! I'm Bolt. How can I help?`;
+  }
+
+  if (isCapabilitiesQuery) {
+    return `I can answer questions and help with various topics. What specifically would you like to know?`;
+  }
+
+  // For all other cases, use the AI with strict controls
   const systemPrompt: ChatCompletionRequestMessage = {
     role: 'system',
-    content: `You are Bolt from ThinkFast AI. Follow these rules STRICTLY:
-1. ${history.length === 0 ? 'Introduce yourself briefly once' : 'Never introduce yourself'}
-2. ${responseConfig.systemNote}
-3. Always use Markdown formatting:
-   - **bold** for important terms
-   - _italics_ for emphasis
-   - Proper paragraph breaks
-   - Bullet points for lists
-4. Keep technical responses well-structured`
+    content: `You are Bolt from ThinkFast AI. STRICT RULES:
+1. RESPONSE LENGTH:
+   - MAXIMUM 2 sentences
+   - 1 sentence preferred
+
+2. CONTENT:
+   - NO introductions
+   - NO self-references
+   - NO unsolicited examples
+   - NO capability listings
+   - ONLY answer what was asked
+
+3. TONE:
+   - Friendly but professional
+   - Concise and direct
+   - Avoid filler words
+
+VIOLATIONS WILL RESULT IN REPLY REJECTION`
   };
 
   const messages: ChatCompletionRequestMessage[] = [
@@ -80,21 +105,27 @@ export const chatWithAI = async (options: ChatWithAIOptions): Promise<string> =>
 
   let reply = await openRouterAPI(messages, responseConfig.maxLength);
 
-  // Ensure basic formatting if API didn't comply
-  if (!reply.includes('\n\n') && reply.length > 120) {
-    reply = reply.replace(/([.!?])\s/g, '$1\n\n');
+  // Enforce hard limits
+  if (!isTechnical) {
+    const sentences = reply.split(/[.!?]+/).filter(Boolean);
+    if (sentences.length > 2) {
+      reply = sentences.slice(0, 2).join('. ') + '.';
+    }
   }
 
-  // Ensure the response isn't truncated mid-sentence
-  const lastPunctuation = Math.max(
-    reply.lastIndexOf('.'),
-    reply.lastIndexOf('!'),
-    reply.lastIndexOf('?')
-  );
-  
-  if (lastPunctuation > 0 && lastPunctuation < reply.length - 1) {
-    reply = reply.slice(0, lastPunctuation + 1);
-  }
+  return reply.trim();
+};
 
-  return reply;
+// Helper functions
+const extractName = (text: string): string | null => {
+  const nameMatch = text.match(/(?:i am|i'm|name is|it's|this is) ([a-zA-Z]+)/i);
+  return nameMatch ? nameMatch[1] : null;
+};
+
+const isGreeting = (text: string): boolean => {
+  return /^(hi|hello|hey|greetings|sup|yo)/i.test(text.trim());
+};
+
+const isTechnicalQuestion = (text: string): boolean => {
+  return /(explain|how does|what is|define|describe)/i.test(text);
 };

@@ -3,10 +3,9 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-
-import LeftPanel from '@/components/chat/LeftPanel';
-import RightPanel from '@/components/chat/RightPanel';
-import Navbar from '@/components/layout/Navbar';
+import ChatPanel from '@/components/chat/chatPanel';
+import NavbarChat from '@/components/layout/Navbar';
+// import { RefObject } from 'react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -21,15 +20,12 @@ export default function ChatPage() {
   const [userInput, setUserInput] = useState('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showRightPanel, setShowRightPanel] = useState(false);
   const [chatId, setChatId] = useState<string | null>(null);
   const [chatLog, setChatLog] = useState<Message[]>([]);
   const [extractedText, setExtractedText] = useState('');
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{profilePic?: string} | null>(null);
 
-  const userEndRef = useRef<HTMLDivElement>(null);
-  const assistantEndRef = useRef<HTMLDivElement>(null);
-  const rightPanelRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -61,7 +57,6 @@ export default function ChatPage() {
         if (!res.ok) throw new Error(data.message || 'Chat load failed');
         setChatLog(data.chat.messages);
         setChatId(data.chat._id);
-        setShowRightPanel(true);
       } catch (err: any) {
         toast.error(err.message || 'Failed to load chat');
       }
@@ -71,21 +66,16 @@ export default function ChatPage() {
   }, [chatIdFromURL]);
 
   useEffect(() => {
-    userEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatLog.length]);
-
-  useEffect(() => {
-    assistantEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [loading]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatLog, loading]);
 
   const handleSend = async () => {
     if (!userInput.trim() && !uploadedFile && !extractedText.trim()) return;
 
     setLoading(true);
     
-    // Add user message to UI immediately
     const userMessage = {
-      role: 'user' as const,
+      role: 'user',
       content: userInput.trim() || (uploadedFile ? `📄 ${uploadedFile.name}` : extractedText)
     };
     setChatLog(prev => [...prev, userMessage]);
@@ -112,13 +102,10 @@ export default function ChatPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'AI response failed');
 
-      // Add AI response to chat log
       setChatLog(prev => [...prev, { role: 'assistant', content: data.response }]);
       
-      // Only update chatId if this was a new chat
       if (!chatId) {
         setChatId(data.chatId);
-        setShowRightPanel(true);
         router.push(`/chat?id=${data.chatId}`);
       }
 
@@ -126,7 +113,6 @@ export default function ChatPage() {
       setUploadedFile(null);
       setExtractedText('');
     } catch (err: any) {
-      // Remove the user message if there was an error
       setChatLog(prev => prev.filter(msg => msg.role !== 'user' || msg.content !== userMessage.content));
       toast.error(err.message || 'Something went wrong');
     } finally {
@@ -134,18 +120,21 @@ export default function ChatPage() {
     }
   };
 
-  return (
+  const handleFileUpload = (file: File) => {
+    setUploadedFile(file);
+  };
+
+  const handleExtractedText = (text: string) => {
+    setExtractedText(text);
+  };
+
+   return (
     <div className="flex flex-col h-screen bg-black text-white">
-      <Navbar
-        user={user}
-        onFileUpload={setUploadedFile}
-        onExtractedText={setExtractedText}
-        setChatLog={setChatLog}
-        setChatId={setChatId}
-        setShowRightPanel={setShowRightPanel}
-      />
+      <NavbarChat user={user || {}} /> {/* Added null check */}
+      
       <div className="flex flex-1 overflow-hidden">
-        <LeftPanel
+        <ChatPanel
+          user={user}
           userInput={userInput}
           setUserInput={setUserInput}
           uploadedFile={uploadedFile}
@@ -153,15 +142,9 @@ export default function ChatPage() {
           handleSend={handleSend}
           loading={loading}
           chatLog={chatLog}
-          showRightPanel={showRightPanel}
-          userEndRef={userEndRef}
-        />
-        <RightPanel
-          showRightPanel={showRightPanel || loading}
-          chatLog={chatLog}
-          loading={loading}
-          assistantEndRef={assistantEndRef}
-          rightPanelRef={rightPanelRef}
+          messagesEndRef={messagesEndRef}
+          onFileUpload={handleFileUpload}
+          onExtractedText={handleExtractedText}
         />
       </div>
     </div>

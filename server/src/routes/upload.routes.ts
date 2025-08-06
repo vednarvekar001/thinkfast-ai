@@ -10,6 +10,6 @@ const router = Router()
 
 router.post('/profile', checkAuth, profileUpload.single('file'), handleProfileUpload);
 
-router.post('/chat', checkAuth, chatUpload.single('file'), handleChatUpload);
+router.post('/', checkAuth, chatUpload.single('file'), handleChatUpload);
 
 export default router;
