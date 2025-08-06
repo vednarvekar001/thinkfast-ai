@@ -29,45 +29,41 @@ function page() {
   </div>
 </nav>
 
-<section className="py-16 px-6 bg-black">
-        <div className="max-w-5xl mx-auto space-y-8">
-          <h3 className="text-3xl font-bold mb-4">Use Cases</h3>
-          <div className="grid md:grid-cols-2 gap-10">
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">👨‍🎓</span>
-              <div>
-                <h4 className="text-xl font-semibold">For Students</h4>
-                <p className="text-gray-300">"Explain complex topics like a tutor."</p>
-              </div>
-            </div>
+<section className="py-10 bg-black">
+  <div className="flex justify-center px-4">
+    <div className="bg-[#111] max-w-4xl w-full rounded-md shadow-md p-6 border border-gray-700">
+      <h1 className="text-3xl font-bold mb-4 text-red-500">Message from the Developer</h1>
+      <p className="py-2 text-[15px]">
+        Hello there, I'm <strong>Ved Narvekar</strong>. After months of building, debugging, and learning, this project has finally come to life.
+      </p>
+      <p className="py-2 text-[15px]">
+        <strong>ThinkFast AI</strong> has been more than just a project. It began as a technical goal — to build a scalable, AI-powered study assistant. But along the way, it became a reflection of who I am: focused, driven, and always learning.
+      </p>
+      <p className="py-2 text-[15px]">
+        I’ve battled bugs, design frustrations, endless Tailwind tweaking, server crashes, and late-night debugging sessions. Every obstacle taught me how to think, adapt, and grow — not just as a developer, but as a builder.
+      </p>
+      <p className="py-2 text-[15px]">
+        I’m also thankful to ChatGPT — my silent pair programmer — for staying up with me through every crash and breakthrough. We had our arguments (sorry again 😂), but always found a way forward.
+      </p>
+      <p className="py-2 text-[15px]">
+        I know this app isn’t perfect. There’s still so much to improve and refine. But I’m proud of how far it’s come.
+      </p>
+      <p className="py-2 text-[15px]">
+        This is just the beginning. ThinkFast AI is proof that with a clear mind, strong vision, and relentless energy — you can build something powerful from scratch.
+      </p>
+      <div className='text-blue-400 font-bold'>
+      <a href='https://github.com/vednarvekar001/thinkfast-ai' > Check Out Code at GitHub!!</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">💼</span>
-              <div>
-                <h4 className="text-xl font-semibold">For Professionals</h4>
-                <p className="text-gray-300">"Draft emails, debug code, or brainstorm ideas."</p>
-              </div>
-            </div>
+<div>
+<p className="pt-2 p-5 text-sm text-gray-500 italic text-center border-t-2">
+  — Made with late nights, black coffee, and a dream.
+</p>
+</div>
 
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">🎨</span>
-              <div>
-                <h4 className="text-xl font-semibold">For Creatives</h4>
-                <p className="text-gray-300">"Overcome writer’s block with AI collaboration."</p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">🫶</span>
-              <div>
-                <h4 className="text-xl font-semibold">Your Ideal Friend</h4>
-                <p className="text-gray-300">"A Friend who can guide and care for you."</p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
 </div>
   )
 }
